@@ -6,8 +6,9 @@
 \usage{
 jagsRun(jagsData, jagsModel, jagsInits, params, jagsID, jagsDsc, db_hash,
   n_chain = 3, n_adapt = 5000, n_burn, n_draw, n_thin = 1,
-  DEBUG = FALSE, EXTRA = FALSE, RANDOM = TRUE, Rhat_max = 1.05, n_rburn,
-  n_max, params_extra = params, params_report = params, ppc = NULL)
+  DEBUG = FALSE, EXTRA = FALSE, RANDOM = FALSE, Rhat_max = 1.05,
+  n_rburn = 0, n_max, params_extra = params, params_report = params,
+  ppc = NULL)
 }
 \arguments{
 \item{jagsData}{List containing data to feed to JAGS}
@@ -18,11 +19,11 @@ jagsRun(jagsData, jagsModel, jagsInits, params, jagsID, jagsDsc, db_hash,
 
 \item{params}{Character string or vector of character strings specifying which parameters to track}
 
-\item{jagsID}{Character string with name of jags run (e.g., 'Run_1')}
+\item{jagsID}{OPTIONAL. Character string with name of jags run (e.g., 'Run_1')}
 
-\item{jagsDsc}{Character string with description of the jags run (e.g., 'First model run')}
+\item{jagsDsc}{OPTIONAL. Character string with description of the jags run (e.g., 'First model run')}
 
-\item{db_hash}{Character string with description of data version which will be printed in the output file. Could be latest git commit hash.}
+\item{db_hash}{OPTIONAL. Character string with description of data version which will be printed in the output file. Could be latest git commit hash.}
 
 \item{n_chain}{Numeric specifying number of chains to be run}
 
@@ -53,7 +54,7 @@ jagsRun(jagsData, jagsModel, jagsInits, params, jagsID, jagsDsc, db_hash,
 \item{ppc}{Character string or vector of character strings specifying the name of elements used for the posteriod predictive check (PPC). If specified, the summary information for these elements will be output in the report.}
 }
 \description{
-Run JAGS in parallel and output output of interest.
+Run JAGS in parallel and output output of interest. Number of cores used equals number of chains specified. Be sure that your machine has an adequate number of (virtual) cores available to run the model. Function creates a directory with \code{jagsID} name, saves .rds file with model output, and produces output summary in text file format.
 }
 \section{Notes}{
  jagsData should be formatted as such: XXXXX. jagsInits should be formatted as such: XXXXX. Jags params should be formatted as such: XXXXX.
