@@ -6,3 +6,13 @@ jagsfun
 The package contains one function:
 
 - `jagsfun` - run JAGS in parallel
+
+
+Installation
+------------
+
+You can install the  development version from Github with:
+```{r}
+install.packages('devtools')
+devtools::install_github('caseyyoungflesh/jagsfun')
+```
