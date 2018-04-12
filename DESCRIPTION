@@ -1,4 +1,4 @@
-Package: jagsfun
+Package: jagsRun
 Title: Tools to run JAGS in parallel
 Version: 0.1.0
 Authors@R: c(
