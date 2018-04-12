@@ -1,14 +1,14 @@
 #' Run JAGS
 #'
-#' Run JAGS in parallel and output output of interest.
+#' Run JAGS in parallel and output output of interest. Creates directory with \code{jagsID} name, saves .rds file with model output, and produces output summary in text file format.
 #'
 #' @param jagsData List containing data to feed to JAGS
 #' @param jagsModel JAGS model file
 #' @param jagsInits Initial values for JAGS model. Should be a list of lists (number of embedded lists should equal the number of chains being run in the model). NOTE: each chain should specify a different starting value for a particular parameter and/or use a different seed/RNG to avoid identical chains.
 #' @param params Character string or vector of character strings specifying which parameters to track
-#' @param jagsID Character string with name of jags run (e.g., 'Run_1')
-#' @param jagsDsc Character string with description of the jags run (e.g., 'First model run')
-#' @param db_hash Character string with description of data version which will be printed in the output file. Could be latest git commit hash.
+#' @param jagsID OPTIONAL. Character string with name of jags run (e.g., 'Run_1')
+#' @param jagsDsc OPTIONAL. Character string with description of the jags run (e.g., 'First model run')
+#' @param db_hash OPTIONAL. Character string with description of data version which will be printed in the output file. Could be latest git commit hash.
 #' @param n_chain Numeric specifying number of chains to be run
 #' @param n_adapt Numeric specifying how many iterations to use for adaptation
 #' @param n_burn Numeric specifying how any iterations to use for burn-in
@@ -24,6 +24,8 @@
 #' @param params_report Character string or vector of character strings specifying which parameters to report. Must be a subset of \code{params}.
 #' @param ppc Character string or vector of character strings specifying the name of elements used for the posteriod predictive check (PPC). If specified, the summary information for these elements will be output in the report.
 #' @section Notes: jagsData should be formatted as such: XXXXX. jagsInits should be formatted as such: XXXXX. Jags params should be formatted as such: XXXXX.
+#'
+#' @export
 
 
 
@@ -42,36 +44,43 @@ jagsRun <- function (jagsData,
                      n_thin = 1,
                      DEBUG = FALSE,
                      EXTRA = FALSE,
-                     RANDOM = TRUE,
+                     RANDOM = FALSE,
                      Rhat_max = 1.05,
-                     n_rburn,
+                     n_rburn = 0,
                      n_max,
                      params_extra = params,
                      params_report = params,
-                     ppc = NULL) {
-
-  if (DEBUG == TRUE) {
+                     ppc = NULL)
+{
+  if (DEBUG == TRUE)
+  {
     if (RANDOM == TRUE) start <- jagsInits(jagsData) else start <- jagsInits[[1]]
+
     ptm <- proc.time()
     jm = rjags::jags.model(data = jagsData,
                            file = jagsModel,
                            inits = start,
                            n.chains = 1,
                            n.adapt = 100)
+
     stats::update(jm, n.iter = 100)
+
     out = rjags::coda.samples(jm,
                               n.iter = 100,
                               variable.names = params,
                               thin = 1)
+
     tt <- (proc.time() - ptm)[3] / 60
   }
 
-  if (DEBUG == FALSE) {
+  if (DEBUG == FALSE)
+  {
     CONVERGE <- FALSE
     cl <- parallel::makeCluster(n_chain)
     pid <- NA
 
-    for (i in 1:n_chain) {
+    for (i in 1:n_chain)
+    {
       pidNum <- utils::capture.output(cl[[i]])
       start <- regexpr("pid", pidNum)[[1]]
       end <- nchar(pidNum)
@@ -81,7 +90,7 @@ jagsRun <- function (jagsData,
     parallel::clusterExport(cl, c('pid', 'jagsData', 'n_adapt', 'n_burn', 'n_draw', 'n_thin', 'n_rburn', 'params', 'jagsInits', 'jagsModel', 'RANDOM'), envir = environment())
 
     ptm <- proc.time()
-    out.1 <- parallel::clusterEvalQ(cl, {
+    out.1 <- parallel::clusterEvalQ(cl,{
       require(rjags)
       if (RANDOM == TRUE) start <- jagsInits(jagsData) else {
         processNum <- which(pid == Sys.getpid())
@@ -93,7 +102,9 @@ jagsRun <- function (jagsData,
                              inits = start,
                              n.chains = 1,
                              n.adapt = n_adapt)
+
       stats::update(jm, n.iter = n_burn)
+
       samples = rjags::coda.samples(jm,
                                     n.iter = n_draw,
                                     variable.names = params,
@@ -104,7 +115,8 @@ jagsRun <- function (jagsData,
     tt <- (proc.time() - ptm)[3] / 60
     i <- 1
     a <- vector("list", n_chain)
-    while(i <= n_chain) {
+    while(i <= n_chain)
+    {
       a[[i]] <- out.1[[i]][[1]]
       i <- i + 1
     }
@@ -115,7 +127,8 @@ jagsRun <- function (jagsData,
 
     if (max(MCMCvis::MCMCsummary(out, params = params_report, Rhat = TRUE)[,6]) <= Rhat_max) CONVERGE <- TRUE
 
-    if (EXTRA == TRUE) {
+    if (EXTRA == TRUE)
+    {
 
       while(max(MCMCvis::MCMCsummary(out, params = params_extra, Rhat = TRUE)[,6]) > Rhat_max & n_total < n_max) {
         out.2 <- parallel::clusterEvalQ(cl, {
@@ -129,7 +142,8 @@ jagsRun <- function (jagsData,
 
         i <- 1
         a <- vector("list", n_chain)
-        while(i <= n_chain) {
+        while(i <= n_chain)
+        {
           a[[i]] <- out.2[[i]][[1]]
           i <- i + 1
         }
@@ -146,11 +160,27 @@ jagsRun <- function (jagsData,
     closeAllConnections()
     s_out <- MCMCvis::MCMCsummary(out, params = params_report, n.eff = TRUE, digits = 4)
     options(max.print = 50000)
-    system(paste0('mkdir ', jagsID))
+
+    if (missing(jagsID))
+    {
+      jagsID <- 'jagsRun_output'
+    }
+    dir.create(jagsID)
+
     sink(paste0(jagsID, '/results.txt'))
-    cat(paste0(jagsID, ' \n'))
-    cat(paste0(jagsDsc, ' \n'))
-    cat(paste0('db_hash: ', db_hash, ' \n'))
+    cat(paste0('jagsID: ', jagsID, ' \n'))
+    if (!missing(jagsDsc))
+    {
+      cat(paste0('jagsDsc: ', jagsDsc, ' \n'))
+    } else {
+      cat(paste0('jagsDsc: NONE GIVEN', ' \n'))
+    }
+    if (!missing(db_hash))
+    {
+      cat(paste0('db_hash: ', db_hash, ' \n'))
+    } else {
+      cat(paste0('db_hash: NONE GIVEN', ' \n'))
+    }
     cat(paste0('Random Inits: ', RANDOM, ' \n'))
     cat(paste0("Inits object: ", as.character(deparse(substitute(jagsInits))), ' \n'))
     cat(paste0('Total minutes: ', round(tt, digits = 2), ' \n'))
