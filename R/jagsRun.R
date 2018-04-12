@@ -5,10 +5,10 @@
 #' @param jagsData List containing data to feed to JAGS
 #' @param jagsModel JAGS model file
 #' @param jagsInits Initial values for JAGS model. Should be a list of lists (number of embedded lists should equal the number of chains being run in the model). NOTE: each chain should specify a different starting value for a particular parameter and/or use a different seed/RNG to avoid identical chains.
+#' @param params Character string or vector of character strings specifying which parameters to track
 #' @param jagsID Character string with name of jags run (e.g., 'Run_1')
 #' @param jagsDsc Character string with description of the jags run (e.g., 'First model run')
 #' @param db_hash Character string with description of data version which will be printed in the output file. Could be latest git commit hash.
-#' @param params Character string or vector of character strings specifying which parameters to track
 #' @param n_chain Numeric specifying number of chains to be run
 #' @param n_adapt Numeric specifying how many iterations to use for adaptation
 #' @param n_burn Numeric specifying how any iterations to use for burn-in
@@ -23,6 +23,7 @@
 #' @param params_extra Character string or vector of character strings specifying which parameters to evaluate convergence for when \code{EXTRA = TRUE}. Must be a subset of \code{params}.
 #' @param params_report Character string or vector of character strings specifying which parameters to report. Must be a subset of \code{params}.
 #' @param ppc Character string or vector of character strings specifying the name of elements used for the posteriod predictive check (PPC). If specified, the summary information for these elements will be output in the report.
+#' @section Notes: jagsData should be formatted as such: XXXXX. jagsInits should be formatted as such: XXXXX. Jags params should be formatted as such: XXXXX.
 
 
 
@@ -30,10 +31,10 @@
 jagsRun <- function (jagsData,
                      jagsModel,
                      jagsInits,
+                     params,
                      jagsID,
                      jagsDsc,
                      db_hash,
-                     params,
                      n_chain = 3,
                      n_adapt = 5000,
                      n_burn,

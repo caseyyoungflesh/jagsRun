@@ -4,7 +4,7 @@
 \alias{jagsRun}
 \title{Run JAGS}
 \usage{
-jagsRun(jagsData, jagsModel, jagsInits, jagsID, jagsDsc, db_hash, params,
+jagsRun(jagsData, jagsModel, jagsInits, params, jagsID, jagsDsc, db_hash,
   n_chain = 3, n_adapt = 5000, n_burn, n_draw, n_thin = 1,
   DEBUG = FALSE, EXTRA = FALSE, RANDOM = TRUE, Rhat_max = 1.05, n_rburn,
   n_max, params_extra = params, params_report = params, ppc = NULL)
@@ -16,13 +16,13 @@ jagsRun(jagsData, jagsModel, jagsInits, jagsID, jagsDsc, db_hash, params,
 
 \item{jagsInits}{Initial values for JAGS model. Should be a list of lists (number of embedded lists should equal the number of chains being run in the model). NOTE: each chain should specify a different starting value for a particular parameter and/or use a different seed/RNG to avoid identical chains.}
 
+\item{params}{Character string or vector of character strings specifying which parameters to track}
+
 \item{jagsID}{Character string with name of jags run (e.g., 'Run_1')}
 
 \item{jagsDsc}{Character string with description of the jags run (e.g., 'First model run')}
 
 \item{db_hash}{Character string with description of data version which will be printed in the output file. Could be latest git commit hash.}
-
-\item{params}{Character string or vector of character strings specifying which parameters to track}
 
 \item{n_chain}{Numeric specifying number of chains to be run}
 
@@ -55,3 +55,7 @@ jagsRun(jagsData, jagsModel, jagsInits, jagsID, jagsDsc, db_hash, params,
 \description{
 Run JAGS in parallel and output output of interest.
 }
+\section{Notes}{
+ jagsData should be formatted as such: XXXXX. jagsInits should be formatted as such: XXXXX. Jags params should be formatted as such: XXXXX.
+}
+
