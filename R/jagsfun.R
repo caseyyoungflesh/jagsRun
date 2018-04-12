@@ -19,7 +19,7 @@
 #' @param RANDOM Logical specifying whether to use script to generate random inits. If \code{TRUE}, \code{jagsInits} should be a function that generates random initial values.
 #' @param Rhat_max Numeric specifying the maximum Rhat value allowed when \code{EXTRA = TRUE}
 #' @param n_rburn Numeric specifying how many samples to use for burn in if \code{EXTRA = TRUE} and convergence (defined by \code{Rhat_max}) has not been reached.
-#' @param nmax Numeric specifying the maximum number of samples to be drawn when \code{EXTRA = TRUE}
+#' @param n_max Numeric specifying the maximum number of samples to be drawn when \code{EXTRA = TRUE}
 #' @param params_extra Character string or vector of character strings specifying which parameters to evaluate convergence for when \code{EXTRA = TRUE}. Must be a subset of \code{params}.
 #' @param params_report Character string or vector of character strings specifying which parameters to report. Must be a subset of \code{params}.
 #' @param ppc Character string or vector of character strings specifying the name of elements used for the posteriod predictive check (PPC). If specified, the summary information for these elements will be output in the report.
@@ -57,7 +57,7 @@ jagsRun <- function (jagsData,
                            inits = start,
                            n.chains = 1,
                            n.adapt = 100)
-    update(jm, n.iter = 100)
+    stats::update(jm, n.iter = 100)
     out = rjags::coda.samples(jm,
                               n.iter = 100,
                               variable.names = params,
@@ -92,7 +92,7 @@ jagsRun <- function (jagsData,
                              inits = start,
                              n.chains = 1,
                              n.adapt = n_adapt)
-      update(jm, n.iter = n_burn)
+      stats::update(jm, n.iter = n_burn)
       samples = rjags::coda.samples(jm,
                                     n.iter = n_draw,
                                     variable.names = params,
@@ -118,7 +118,7 @@ jagsRun <- function (jagsData,
 
       while(max(MCMCvis::MCMCsummary(out, params = params_extra, Rhat = TRUE)[,6]) > Rhat_max & n_total < n_max) {
         out.2 <- parallel::clusterEvalQ(cl, {
-          update(jm, n.iter = n_rburn)
+          stats::update(jm, n.iter = n_rburn)
           samples = rjags::coda.samples(jm,
                                         n.iter = n_draw,
                                         variable.names = params,

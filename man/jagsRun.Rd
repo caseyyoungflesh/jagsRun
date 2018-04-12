@@ -44,13 +44,13 @@ jagsRun(jagsData, jagsModel, jagsInits, jagsID, jagsDsc, db_hash, params,
 
 \item{n_rburn}{Numeric specifying how many samples to use for burn in if \code{EXTRA = TRUE} and convergence (defined by \code{Rhat_max}) has not been reached.}
 
+\item{n_max}{Numeric specifying the maximum number of samples to be drawn when \code{EXTRA = TRUE}}
+
 \item{params_extra}{Character string or vector of character strings specifying which parameters to evaluate convergence for when \code{EXTRA = TRUE}. Must be a subset of \code{params}.}
 
 \item{params_report}{Character string or vector of character strings specifying which parameters to report. Must be a subset of \code{params}.}
 
 \item{ppc}{Character string or vector of character strings specifying the name of elements used for the posteriod predictive check (PPC). If specified, the summary information for these elements will be output in the report.}
-
-\item{nmax}{Numeric specifying the maximum number of samples to be drawn when \code{EXTRA = TRUE}}
 }
 \description{
 Run JAGS in parallel and output output of interest.
