@@ -2,8 +2,9 @@ Package: jagsfun
 Title: Tools to run JAGS in parallel
 Version: 0.1.0
 Authors@R: c(
-    person("Casey", "Youngflesh", role = c("aut", "cre"), email = "caseyyoungflesh@gmail.com", comment = c(ORCID = "0000-0001-6343-3311")), 
-    person("Christian", "Che_Castaldo", role = c("aut", "cre"), email = "checastaldo@icloud.com")
+    person("Casey", "Youngflesh", , "caseyyoungflesh@gmail.com", c("aut", "cre")),
+    person("Christian", "Che-Castaldo", role = c("aut"), email = "checastaldo@icloud.com")
+    )
 Description: jagsfun provides tools to run JAGS in parallel and summarize output information. These tools were developed with HPC clusters in mind, as a part of a streamlined workflow for large-scale Bayesian analysis.
 Depends: R (>= 3.4.3)
 License: GPL-3
@@ -14,3 +15,4 @@ Imports:
     parallel,
     coda,
     MCMCvis
+RoxygenNote: 6.0.1
