@@ -1,6 +1,6 @@
 #' Run JAGS
 #'
-#' Run JAGS in parallel and output output of interest. Creates directory with \code{jagsID} name, saves .rds file with model output, and produces output summary in text file format.
+#' Run JAGS in parallel and output output of interest. Number of cores used equals number of chains specified. Be sure that your machine has an adequate number of (virtual) cores available to run the model. Function creates a directory with \code{jagsID} name, saves .rds file with model output, and produces output summary in text file format.
 #'
 #' @param jagsData List containing data to feed to JAGS
 #' @param jagsModel JAGS model file
@@ -207,6 +207,8 @@ jagsRun <- function (jagsData,
     cat(' \n')
     print(s_out)
     sink()
+
+    saveRDS(out, paste0(jagsID, '/', jagsID, '.rds'))
   }
   return(out)
 }
