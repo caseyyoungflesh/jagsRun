@@ -18,3 +18,9 @@ You can install the  development version from Github with:
 install.packages('devtools')
 devtools::install_github('caseyyoungflesh/jagsRun')
 ```
+
+If there are firewall issues or issues with libcurl when using devtools the following can be run from bash terminal to install package in specified location (with cluster use):
+```
+wget --no-check-certificate https://github.com/caseyyoungflesh/jagsRun/archive/master.tar.gz
+R CMD INSTALL master.tar.gz
+```
