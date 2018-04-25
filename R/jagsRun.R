@@ -71,6 +71,11 @@ jagsRun <- function (jagsData,
                               thin = 1)
 
     tt <- (proc.time() - ptm)[3] / 60
+
+    if(jagsModel %in% list.files())
+    {
+      invisible(file.remove(jagsModel))
+    }
   }
 
   if (DEBUG == FALSE)
@@ -167,6 +172,12 @@ jagsRun <- function (jagsData,
     }
     dir.create(jagsID)
 
+    #move .jags file into dir
+    if(jagsModel %in% list.files())
+    {
+      invisible(file.rename(from = paste0(jagsModel), to = paste0(jagsID, '/', jagsModel)))
+    }
+
     sink(paste0(jagsID, '/results.txt'))
     cat(paste0('jagsID: ', jagsID, ' \n'))
     if (!missing(jagsDsc))
@@ -209,6 +220,7 @@ jagsRun <- function (jagsData,
     sink()
 
     saveRDS(out, paste0(jagsID, '/', jagsID, '.rds'))
+
   }
   return(out)
 }
