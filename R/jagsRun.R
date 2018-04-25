@@ -61,12 +61,12 @@ jagsRun <- function (jagsData,
                            file = jagsModel,
                            inits = start,
                            n.chains = 1,
-                           n.adapt = 100)
+                           n.adapt = 10)
 
-    stats::update(jm, n.iter = 100)
+    stats::update(jm, n.iter = 10)
 
     out = rjags::coda.samples(jm,
-                              n.iter = 100,
+                              n.iter = 10,
                               variable.names = params,
                               thin = 1)
 
