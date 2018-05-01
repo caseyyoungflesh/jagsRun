@@ -8,7 +8,7 @@ jagsRun(jagsData, jagsModel, jagsInits, params, jagsID, jagsDsc, db_hash,
   n_chain = 3, n_adapt = 5000, n_burn, n_draw, n_thin = 1,
   DEBUG = FALSE, EXTRA = FALSE, RANDOM = FALSE, Rhat_max = 1.05,
   n_rburn = 0, n_max, params_extra = params, params_report = params,
-  ppc = NULL)
+  ppc = NULL, obj_out = FALSE, save_data = FALSE)
 }
 \arguments{
 \item{jagsData}{List containing data to feed to JAGS}
@@ -52,6 +52,10 @@ jagsRun(jagsData, jagsModel, jagsInits, params, jagsID, jagsDsc, db_hash,
 \item{params_report}{Character string or vector of character strings specifying which parameters to report. Must be a subset of \code{params}.}
 
 \item{ppc}{Character string or vector of character strings specifying the name of elements used for the posteriod predictive check (PPC). If specified, the summary information for these elements will be output in the report.}
+
+\item{obj_out}{Logical specifying whether MCMC.list object should be output}
+
+\item{save_data}{Logical specifying whether input data to function should be saved as a .rds object}
 }
 \description{
 Run JAGS in parallel and output output of interest. Number of cores used equals number of chains specified. Be sure that your machine has an adequate number of (virtual) cores available to run the model. Function creates a directory with \code{jagsID} name, saves .rds file with model output, and produces output summary in text file format.
