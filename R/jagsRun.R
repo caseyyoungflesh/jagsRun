@@ -23,6 +23,7 @@
 #' @param params_extra Character string or vector of character strings specifying which parameters to evaluate convergence for when \code{EXTRA = TRUE}. Must be a subset of \code{params}.
 #' @param params_report Character string or vector of character strings specifying which parameters to report. Must be a subset of \code{params}.
 #' @param ppc Character string or vector of character strings specifying the name of elements used for the posteriod predictive check (PPC). If specified, the summary information for these elements will be output in the report.
+#' @param obj_out Logical specifing if MCMC.list object should be output
 #' @section Notes: jagsData should be formatted as such: XXXXX. jagsInits should be formatted as such: XXXXX. Jags params should be formatted as such: XXXXX.
 #'
 #' @export
@@ -50,7 +51,8 @@ jagsRun <- function (jagsData,
                      n_max,
                      params_extra = params,
                      params_report = params,
-                     ppc = NULL)
+                     ppc = NULL,
+                     obj_out = FALSE)
 {
   if (DEBUG == TRUE)
   {
@@ -222,5 +224,9 @@ jagsRun <- function (jagsData,
     saveRDS(out, paste0(jagsID, '/', jagsID, '.rds'))
 
   }
-  return(out)
+
+  if(obj_out == TRUE)
+  {
+    return(out)
+  }
 }
