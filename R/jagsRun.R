@@ -14,7 +14,7 @@
 #' @param n_burn Numeric specifying how any iterations to use for burn-in
 #' @param n_draw Numeric specifying how many iterations to use for draw (iterations to be kept beyond adaptation and burn-in)
 #' @param n_thin Numeric specifying thinning rate
-#' @param TYPE Character string specifying which type of model to run. Options are 'STANDARD' (normal model run), COMPILE' (model is comiled only with adapt = 2 [no samples drawn] to check that the likelihood can be calculated [priors and inits are appropriate]), and 'DEBUG'(model run with one chain with 10 samples for adaptation, 10 samples for burn-in, 10 samples kept)
+#' @param DEBUG Logical used to specify whether DEBUG mode should be used. If \code{TRUE}, \code{jags.model} is called which begins adaptation with adapt = 2. This ensures that the likelihood can be calclated and the model run (priors and inits are appropriate).
 #' @param EXTRA Logical used to specify whether extra iterations should be run if convergence is not met. If \code{TRUE}, up to \code{n_max} iterations are run until convergence is reached (specified by \code{Rhat_max})
 #' @param RANDOM Logical specifying whether to use script to generate random inits. If \code{TRUE}, \code{jagsInits} should be a function that generates random initial values.
 #' @param Rhat_max Numeric specifying the maximum Rhat value allowed when \code{EXTRA = TRUE}
@@ -44,7 +44,7 @@ jagsRun <- function (jagsData,
                      n_burn,
                      n_draw,
                      n_thin = 1,
-                     TYPE = 'STANDARD',
+                     DEBUG = FALSE,
                      EXTRA = FALSE,
                      RANDOM = FALSE,
                      Rhat_max = 1.05,
@@ -56,7 +56,7 @@ jagsRun <- function (jagsData,
                      obj_out = FALSE,
                      save_data = FALSE)
 {
-  if (TYPE == 'COMPILE')
+  if (DEBUG == TRUE)
   {
     if (RANDOM == TRUE) start <- jagsInits(jagsData) else start <- jagsInits[[1]]
 
@@ -72,37 +72,10 @@ jagsRun <- function (jagsData,
       invisible(file.remove(jagsModel))
     }
 
-    print('Successful!')
+    print('Successful compilation!')
   }
 
-  if (TYPE == 'DEBUG')
-  {
-    if (RANDOM == TRUE) start <- jagsInits(jagsData) else start <- jagsInits[[1]]
-
-    ptm <- proc.time()
-    invisible(rjags::load.module('glm'))
-    jm = rjags::jags.model(data = jagsData,
-                           file = jagsModel,
-                           inits = start,
-                           n.chains = 1,
-                           n.adapt = 10)
-
-    stats::update(jm, n.iter = 10)
-
-    out = rjags::coda.samples(jm,
-                              n.iter = 10,
-                              variable.names = params,
-                              thin = 1)
-
-    tt <- (proc.time() - ptm)[3] / 60
-
-    if(jagsModel %in% list.files())
-    {
-      invisible(file.remove(jagsModel))
-    }
-  }
-
-  if (TYPE == 'STANDARD')
+  if (DEBUG == FALSE)
   {
     CONVERGE <- FALSE
     cl <- parallel::makeCluster(n_chain)
