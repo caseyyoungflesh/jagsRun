@@ -6,10 +6,9 @@
 \usage{
 jagsRun(jagsData, jagsModel, jagsInits, params, jagsID, jagsDsc, db_hash,
   n_chain = 3, n_adapt = 5000, n_burn, n_draw, n_thin = 1,
-  DEBUG = FALSE, JCOMPILE = FALSE, EXTRA = FALSE, RANDOM = FALSE,
-  Rhat_max = 1.05, n_rburn = 0, n_max, params_extra = params,
-  params_report = params, ppc = NULL, obj_out = FALSE,
-  save_data = FALSE)
+  TYPE = "STANDARD", EXTRA = FALSE, RANDOM = FALSE, Rhat_max = 1.05,
+  n_rburn = 0, n_max, params_extra = params, params_report = params,
+  ppc = NULL, obj_out = FALSE, save_data = FALSE)
 }
 \arguments{
 \item{jagsData}{List containing data to feed to JAGS}
@@ -36,9 +35,7 @@ jagsRun(jagsData, jagsModel, jagsInits, params, jagsID, jagsDsc, db_hash,
 
 \item{n_thin}{Numeric specifying thinning rate}
 
-\item{DEBUG}{Logical used to specify whether debug method should be used. If \code{TRUE}, runs only one chain with 100 samples for adaptation, 100 samples for burn in, and 100 samples kept.}
-
-\item{JCOMPILE}{Logical used to specify whether just compilation should be completed (no actual model run), which is used to check that the likelihood can be calculated (priors and inits are appropriate)}
+\item{TYPE}{Character string specifying which type of model to run. Options are 'STANDARD' (normal model run), COMPILE' (model is comiled only with adapt = 2 [no samples drawn] to check that the likelihood can be calculated [priors and inits are appropriate]), and 'DEBUG'(model run with one chain with 10 samples for adaptation, 10 samples for burn-in, 10 samples kept)}
 
 \item{EXTRA}{Logical used to specify whether extra iterations should be run if convergence is not met. If \code{TRUE}, up to \code{n_max} iterations are run until convergence is reached (specified by \code{Rhat_max})}
 
