@@ -15,6 +15,7 @@
 #' @param n_draw Numeric specifying how many iterations to use for draw (iterations to be kept beyond adaptation and burn-in)
 #' @param n_thin Numeric specifying thinning rate
 #' @param DEBUG Logical used to specify whether debug method should be used. If \code{TRUE}, runs only one chain with 100 samples for adaptation, 100 samples for burn in, and 100 samples kept.
+#' @param JCOMPILE Logical used to specify whether just compilation should be completed (no actual model run), which is used to check that the likelihood can be calculated (priors and inits are appropriate)
 #' @param EXTRA Logical used to specify whether extra iterations should be run if convergence is not met. If \code{TRUE}, up to \code{n_max} iterations are run until convergence is reached (specified by \code{Rhat_max})
 #' @param RANDOM Logical specifying whether to use script to generate random inits. If \code{TRUE}, \code{jagsInits} should be a function that generates random initial values.
 #' @param Rhat_max Numeric specifying the maximum Rhat value allowed when \code{EXTRA = TRUE}
@@ -45,6 +46,7 @@ jagsRun <- function (jagsData,
                      n_draw,
                      n_thin = 1,
                      DEBUG = FALSE,
+                     JCOMPILE = FALSE,
                      EXTRA = FALSE,
                      RANDOM = FALSE,
                      Rhat_max = 1.05,
@@ -56,6 +58,24 @@ jagsRun <- function (jagsData,
                      obj_out = FALSE,
                      save_data = FALSE)
 {
+  if (JCOMPILE == TRUE)
+  {
+    if (RANDOM == TRUE) start <- jagsInits(jagsData) else start <- jagsInits[[1]]
+
+    invisible(rjags::load.module('glm'))
+    jm = rjags::jags.model(data = jagsData,
+                           file = jagsModel,
+                           inits = start,
+                           n.chains = 1,
+                           n.adapt = 2)
+
+    if(jagsModel %in% list.files())
+    {
+      invisible(file.remove(jagsModel))
+    }
+
+    print('Successful!')
+  }
   if (DEBUG == TRUE)
   {
     if (RANDOM == TRUE) start <- jagsInits(jagsData) else start <- jagsInits[[1]]
