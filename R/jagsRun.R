@@ -61,6 +61,7 @@ jagsRun <- function (jagsData,
     if (RANDOM == TRUE) start <- jagsInits(jagsData) else start <- jagsInits[[1]]
 
     ptm <- proc.time()
+    invisible(rjags::load.module('glm'))
     jm = rjags::jags.model(data = jagsData,
                            file = jagsModel,
                            inits = start,
@@ -106,6 +107,7 @@ jagsRun <- function (jagsData,
         start <- jagsInits[[processNum]]
       }
 
+      invisible(rjags::load.module('glm'))
       jm = rjags::jags.model(data = jagsData,
                              file = jagsModel,
                              inits = start,
