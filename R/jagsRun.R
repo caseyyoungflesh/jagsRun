@@ -161,7 +161,7 @@ jagsRun <- function (jagsData,
 
     parallel::stopCluster(cl)
     closeAllConnections()
-    s_out <- MCMCvis::MCMCsummary(out, params = params_report, n.eff = TRUE, digits = 4)
+    s_out <- MCMCvis::MCMCsummary(out, params = params_report, n.eff = TRUE, round = 4)
     options(max.print = 50000)
 
     if (missing(jagsID))
@@ -210,7 +210,7 @@ jagsRun <- function (jagsData,
     cat(paste0('convergence: ', CONVERGE, ' \n'))
 
     if (is.null(ppc) == FALSE) {
-      cat(paste0('ppc: ', MCMCvis::MCMCsummary(out, params = ppc, n.eff = TRUE, digits = 4)[, 1], '\n'))
+      cat(paste0('ppc: ', MCMCvis::MCMCsummary(out, params = ppc, n.eff = TRUE, round = 4)[, 1], '\n'))
     }
 
     cat(' \n')
