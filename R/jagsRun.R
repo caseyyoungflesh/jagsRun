@@ -54,7 +54,8 @@ jagsRun <- function (jagsData,
                      params_report = params,
                      ppc = NULL,
                      obj_out = FALSE,
-                     save_data = FALSE)
+                     save_data = FALSE,
+                     report = TRUE)
 {
   if (DEBUG == TRUE)
   {
@@ -161,67 +162,71 @@ jagsRun <- function (jagsData,
 
     parallel::stopCluster(cl)
     closeAllConnections()
-    s_out <- MCMCvis::MCMCsummary(out, params = params_report, n.eff = TRUE, round = 4)
-    options(max.print = 50000)
 
-    if (missing(jagsID))
+    if (report == TRUE)
     {
-      jagsID <- 'jagsRun_output'
-    }
-    dir.create(jagsID)
+      s_out <- MCMCvis::MCMCsummary(out, params = params_report, n.eff = TRUE, round = 4)
+      options(max.print = 50000)
 
-    #move .jags file into dir
-    if(jagsModel %in% list.files())
-    {
-      invisible(file.rename(from = paste0(jagsModel), to = paste0(jagsID, '/', jagsModel)))
-    }
+      if (missing(jagsID))
+      {
+        jagsID <- 'jagsRun_output'
+      }
+      dir.create(jagsID)
 
-    sink(paste0(jagsID, '/results.txt'))
-    cat(paste0('jagsID: ', jagsID, ' \n'))
-    if (!missing(jagsDsc))
-    {
-      cat(paste0('jagsDsc: ', jagsDsc, ' \n'))
-    } else {
-      cat(paste0('jagsDsc: NONE GIVEN', ' \n'))
-    }
-    if (!missing(db_hash))
-    {
-      cat(paste0('db_hash: ', db_hash, ' \n'))
-    } else {
-      cat(paste0('db_hash: NONE GIVEN', ' \n'))
-    }
-    cat(paste0('Random Inits: ', RANDOM, ' \n'))
-    cat(paste0("Inits object: ", as.character(deparse(substitute(jagsInits))), ' \n'))
-    cat(paste0('Total minutes: ', round(tt, digits = 2), ' \n'))
-    cat(paste0('Total iterations: ', n_total, ' \n'))
-    cat(paste0('n_chain: ', n_chain, ' \n'))
-    cat(paste0('n_adapt: ', n_adapt, ' \n'))
-    cat(paste0('n_burn: ', n_burn, ' \n'))
-    cat(paste0('n_draw: ', n_draw, ' \n'))
-    cat(paste0('n_thin: ', n_thin, ' \n'))
-    cat(paste0('Total samples kept: ', n_chain * (n_draw / n_thin), ' \n'))
-    cat(paste0('Extended burnin: ', EXTRA, ' \n'))
+      #move .jags file into dir
+      if(jagsModel %in% list.files())
+      {
+        invisible(file.rename(from = paste0(jagsModel), to = paste0(jagsID, '/', jagsModel)))
+      }
 
-    if (EXTRA == TRUE) {
-      cat(paste0('Rhat_max: ', Rhat_max, ' \n'))
-      cat(paste0('n_extra: ', n_extra, ' \n'))
-    }
+      sink(paste0(jagsID, '/results.txt'))
+      cat(paste0('jagsID: ', jagsID, ' \n'))
+      if (!missing(jagsDsc))
+      {
+        cat(paste0('jagsDsc: ', jagsDsc, ' \n'))
+      } else {
+        cat(paste0('jagsDsc: NONE GIVEN', ' \n'))
+      }
+      if (!missing(db_hash))
+      {
+        cat(paste0('db_hash: ', db_hash, ' \n'))
+      } else {
+        cat(paste0('db_hash: NONE GIVEN', ' \n'))
+      }
+      cat(paste0('Random Inits: ', RANDOM, ' \n'))
+      cat(paste0("Inits object: ", as.character(deparse(substitute(jagsInits))), ' \n'))
+      cat(paste0('Total minutes: ', round(tt, digits = 2), ' \n'))
+      cat(paste0('Total iterations: ', n_total, ' \n'))
+      cat(paste0('n_chain: ', n_chain, ' \n'))
+      cat(paste0('n_adapt: ', n_adapt, ' \n'))
+      cat(paste0('n_burn: ', n_burn, ' \n'))
+      cat(paste0('n_draw: ', n_draw, ' \n'))
+      cat(paste0('n_thin: ', n_thin, ' \n'))
+      cat(paste0('Total samples kept: ', n_chain * (n_draw / n_thin), ' \n'))
+      cat(paste0('Extended burnin: ', EXTRA, ' \n'))
 
-    cat(paste0('convergence: ', CONVERGE, ' \n'))
+      if (EXTRA == TRUE) {
+        cat(paste0('Rhat_max: ', Rhat_max, ' \n'))
+        cat(paste0('n_extra: ', n_extra, ' \n'))
+      }
 
-    if (is.null(ppc) == FALSE) {
-      cat(paste0('ppc: ', MCMCvis::MCMCsummary(out, params = ppc, n.eff = TRUE, round = 4)[, 1], '\n'))
-    }
+      cat(paste0('convergence: ', CONVERGE, ' \n'))
 
-    cat(' \n')
-    print(s_out)
-    sink()
+      if (is.null(ppc) == FALSE) {
+        cat(paste0('ppc: ', MCMCvis::MCMCsummary(out, params = ppc, n.eff = TRUE, round = 4)[, 1], '\n'))
+      }
 
-    saveRDS(out, paste0(jagsID, '/', jagsID, '.rds'))
+      cat(' \n')
+      print(s_out)
+      sink()
 
-    if (save_data == TRUE)
-    {
-      saveRDS(jagsData, paste0(jagsID, '/jagsData.rds'))
+      saveRDS(out, paste0(jagsID, '/', jagsID, '.rds'))
+
+      if (save_data == TRUE)
+      {
+        saveRDS(jagsData, paste0(jagsID, '/jagsData.rds'))
+      }
     }
 
     if(obj_out == TRUE)
