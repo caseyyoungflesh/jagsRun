@@ -25,6 +25,7 @@
 #' @param ppc Character string or vector of character strings specifying the name of elements used for the posteriod predictive check (PPC). If specified, the summary information for these elements will be output in the report.
 #' @param obj_out Logical specifying whether MCMC.list object should be output
 #' @param save_data Logical specifying whether input data to function should be saved as a .rds object
+#' @param report Logical specifying whether to generate directory with report and .rds object - if FALSE, MCMC.list object is output
 #' @section Notes: jagsData should be formatted as such: XXXXX. jagsInits should be formatted as such: XXXXX. Jags params should be formatted as such: XXXXX.
 #'
 #' @export
@@ -227,9 +228,14 @@ jagsRun <- function (jagsData,
       {
         saveRDS(jagsData, paste0(jagsID, '/jagsData.rds'))
       }
+
+      if (obj_out == TRUE)
+      {
+        return(out)
+      }
     }
 
-    if(obj_out == TRUE)
+    if (report == FALSE)
     {
       return(out)
     }

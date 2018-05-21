@@ -8,7 +8,7 @@ jagsRun(jagsData, jagsModel, jagsInits, params, jagsID, jagsDsc, db_hash,
   n_chain = 3, n_adapt = 5000, n_burn, n_draw, n_thin = 1,
   DEBUG = FALSE, EXTRA = FALSE, RANDOM = FALSE, Rhat_max = 1.05,
   n_rburn = 0, n_max, params_extra = params, params_report = params,
-  ppc = NULL, obj_out = FALSE, save_data = FALSE)
+  ppc = NULL, obj_out = FALSE, save_data = FALSE, report = TRUE)
 }
 \arguments{
 \item{jagsData}{List containing data to feed to JAGS}
@@ -56,6 +56,8 @@ jagsRun(jagsData, jagsModel, jagsInits, params, jagsID, jagsDsc, db_hash,
 \item{obj_out}{Logical specifying whether MCMC.list object should be output}
 
 \item{save_data}{Logical specifying whether input data to function should be saved as a .rds object}
+
+\item{report}{Logical specifying whether to generate directory with report and .rds object - if FALSE, MCMC.list object is output}
 }
 \description{
 Run JAGS in parallel and output output of interest. Number of cores used equals number of chains specified. Be sure that your machine has an adequate number of (virtual) cores available to run the model. Function creates a directory with \code{jagsID} name, saves .rds file with model output, and produces output summary in text file format.
