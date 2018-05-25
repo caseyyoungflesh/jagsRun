@@ -236,6 +236,11 @@ jagsRun <- function (jagsData,
 
     if (report == FALSE)
     {
+      if(jagsModel %in% list.files())
+      {
+        invisible(file.remove(jagsModel))
+      }
+
       return(out)
     }
   }
