@@ -62,12 +62,13 @@ jagsRun <- function (jagsData,
   {
     if (RANDOM == TRUE) start <- jagsInits(jagsData) else start <- jagsInits[[1]]
 
-    invisible(rjags::load.module('glm'))
-    jm = rjags::jags.model(data = jagsData,
+    suppressMessages(rjags::load.module('glm'))
+    suppressWarnings(rjags::jags.model(data = jagsData,
                            file = jagsModel,
                            inits = start,
                            n.chains = 1,
-                           n.adapt = 2)
+                           n.adapt = 2,
+                           quiet = TRUE))
 
     if(jagsModel %in% list.files())
     {
@@ -81,6 +82,7 @@ jagsRun <- function (jagsData,
   {
     CONVERGE <- FALSE
     cl <- parallel::makeCluster(n_chain)
+    on.exit(parallel::stopCluster(cl))
     pid <- NA
 
     for (i in 1:n_chain)
@@ -101,7 +103,7 @@ jagsRun <- function (jagsData,
         start <- jagsInits[[processNum]]
       }
 
-      invisible(rjags::load.module('glm'))
+      suppressMessages(rjags::load.module('glm'))
       jm = rjags::jags.model(data = jagsData,
                              file = jagsModel,
                              inits = start,
@@ -160,9 +162,6 @@ jagsRun <- function (jagsData,
         if (max(MCMCvis::MCMCsummary(out, params = params_extra, Rhat = TRUE)[,6]) <= Rhat_max) CONVERGE <- TRUE
       }
     }
-
-    parallel::stopCluster(cl)
-    closeAllConnections()
 
     if (report == TRUE)
     {
