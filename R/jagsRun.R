@@ -130,7 +130,7 @@ jagsRun <- function (jagsData,
 
     out <- coda::mcmc.list(a)
     n_extra <- 0
-    n_total <- n_adapt + n_burn + n_draw * n_chain
+    n_total <- n_burn + n_draw
 
     if (max(MCMCvis::MCMCsummary(out, params = params_report, Rhat = TRUE)[,6]) <= Rhat_max) CONVERGE <- TRUE
 
@@ -158,7 +158,7 @@ jagsRun <- function (jagsData,
         out <- coda::mcmc.list(a)
         tt <- (proc.time() - ptm)[3] / 60
         n_extra <- n_extra + n_rburn + n_draw
-        n_total <- n_adapt + n_burn + n_draw * n_chain
+        n_total <- n_total + n_burn + n_draw
         if (max(MCMCvis::MCMCsummary(out, params = params_extra, Rhat = TRUE)[,6]) <= Rhat_max) CONVERGE <- TRUE
       }
     }
