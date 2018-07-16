@@ -96,28 +96,29 @@ jagsRun <- function (jagsData,
     parallel::clusterExport(cl, c('pid', 'jagsData', 'n_adapt', 'n_burn', 'n_draw', 'n_thin', 'n_rburn', 'params', 'jagsInits', 'jagsModel', 'RANDOM'), envir = environment())
 
     ptm <- proc.time()
-    out.1 <- parallel::clusterEvalQ(cl,{
-      require(rjags)
-      if (RANDOM == TRUE) start <- jagsInits(jagsData) else {
-        processNum <- which(pid == Sys.getpid())
-        start <- jagsInits[[processNum]]
-      }
+    out.1 <- parallel::clusterEvalQ(cl,
+                                    {
+                                      require(rjags)
+                                      if (RANDOM == TRUE) start <- jagsInits(jagsData) else {
+                                        processNum <- which(pid == Sys.getpid())
+                                        start <- jagsInits[[processNum]]
+                                      }
 
-      suppressMessages(rjags::load.module('glm'))
-      jm = rjags::jags.model(data = jagsData,
-                             file = jagsModel,
-                             inits = start,
-                             n.chains = 1,
-                             n.adapt = n_adapt)
+                                      suppressMessages(rjags::load.module('glm'))
+                                      jm <- rjags::jags.model(data = jagsData,
+                                                             file = jagsModel,
+                                                             inits = start,
+                                                             n.chains = 1,
+                                                             n.adapt = n_adapt)
 
-      stats::update(jm, n.iter = n_burn)
+                                      stats::update(jm, n.iter = n_burn)
 
-      samples = rjags::coda.samples(jm,
-                                    n.iter = n_draw,
-                                    variable.names = params,
-                                    thin = n_thin)
-      return(samples)
-    })
+                                      samples <- rjags::coda.samples(jm,
+                                                                    n.iter = n_draw,
+                                                                    variable.names = params,
+                                                                    thin = n_thin)
+                                      return(samples)
+                                    })
 
     tt <- (proc.time() - ptm)[3] / 60
     i <- 1
@@ -129,6 +130,7 @@ jagsRun <- function (jagsData,
     }
 
     out <- coda::mcmc.list(a)
+    n_draw_total <- n_draw
     n_extra <- 0
     n_total <- n_burn + n_draw
 
@@ -136,16 +138,20 @@ jagsRun <- function (jagsData,
 
     if (EXTRA == TRUE)
     {
-
-      while(max(MCMCvis::MCMCsummary(out, params = params_extra, Rhat = TRUE)[,6]) > Rhat_max & n_total < n_max) {
-        out.2 <- parallel::clusterEvalQ(cl, {
-          stats::update(jm, n.iter = n_rburn)
-          samples = rjags::coda.samples(jm,
-                                        n.iter = n_draw,
-                                        variable.names = params,
-                                        thin = n_thin)
-          return(samples)
-        })
+      while(max(MCMCvis::MCMCsummary(out, params = params_extra, Rhat = TRUE)[,6]) > Rhat_max & n_total < n_max)
+      {
+        out.2 <- parallel::clusterEvalQ(cl,
+                                        {
+                                          if (n_rburn > 0)
+                                          {
+                                            stats::update(jm, n.iter = n_rburn)
+                                          }
+                                          samples <- rjags::coda.samples(jm,
+                                          n.iter = n_draw,
+                                          variable.names = params,
+                                          thin = n_thin)
+                                          return(samples)
+                                          })
 
         i <- 1
         a <- vector("list", n_chain)
@@ -157,9 +163,10 @@ jagsRun <- function (jagsData,
 
         out <- coda::mcmc.list(a)
         tt <- (proc.time() - ptm)[3] / 60
-        n_extra <- n_extra + n_rburn + n_draw
-        n_total <- n_total + n_burn + n_draw
         if (max(MCMCvis::MCMCsummary(out, params = params_extra, Rhat = TRUE)[,6]) <= Rhat_max) CONVERGE <- TRUE
+        n_extra <- n_extra + n_rburn + n_draw
+        n_draw_total <- n_draw_total + n_draw
+        n_total <- n_total + n_rburn + n_draw
       }
     }
 
@@ -203,11 +210,12 @@ jagsRun <- function (jagsData,
       cat(paste0('n_burn: ', n_burn, ' \n'))
       cat(paste0('n_draw: ', n_draw, ' \n'))
       cat(paste0('n_thin: ', n_thin, ' \n'))
-      cat(paste0('Total samples kept: ', n_chain * (n_draw / n_thin), ' \n'))
+      cat(paste0('Total samples kept: ', n_chain * (n_draw_total / n_thin), ' \n'))
       cat(paste0('Extended burnin: ', EXTRA, ' \n'))
 
       if (EXTRA == TRUE) {
         cat(paste0('Rhat_max: ', Rhat_max, ' \n'))
+        cat(paste0('n_rburn: ', n_rburn, ' \n'))
         cat(paste0('n_extra: ', n_extra, ' \n'))
       }
 
