@@ -15,11 +15,11 @@
 #' @param n_draw Numeric specifying how many iterations to use for draw (iterations to be kept beyond adaptation and burn-in)
 #' @param n_thin Numeric specifying thinning rate
 #' @param DEBUG Logical used to specify whether DEBUG mode should be used. If \code{TRUE}, \code{jags.model} is called which begins adaptation with adapt = 2. This ensures that the likelihood can be calclated and the model run (priors and inits are appropriate).
-#' @param EXTRA Logical used to specify whether extra iterations should be run if convergence is not met. If \code{TRUE}, up to \code{n_max} iterations are run until convergence is reached (specified by \code{Rhat_max})
+#' @param EXTRA Logical used to specify whether extra iterations should be run if convergence is not met. If \code{TRUE}, another set of iterations (\code{n_draw}) is drawn (up to \code{n_max}) until convergence is reached (specified by \code{Rhat_max})
 #' @param RANDOM Logical specifying whether to use script to generate random inits. If \code{TRUE}, \code{jagsInits} should be a function that generates random initial values.
 #' @param Rhat_max Numeric specifying the maximum Rhat value allowed when \code{EXTRA = TRUE}
 #' @param n_rburn Numeric specifying how many samples to use for burn in if \code{EXTRA = TRUE} and convergence (defined by \code{Rhat_max}) has not been reached.
-#' @param n_max Numeric specifying the maximum number of samples to be drawn when \code{EXTRA = TRUE}
+#' @param n_max Numeric specifying the maximum number of samples to be drawn when \code{EXTRA = TRUE}. The total number of iterations will not exceed this value (\code{n_burn}, \code{n_draw}, and \code{n_rburn} values are included in this total). If left blank, \code{n_max} is set to \code{n_burn} + (\code{n_rburn} + \code{n_draw})*2.
 #' @param params_extra Character string or vector of character strings specifying which parameters to evaluate convergence for when \code{EXTRA = TRUE}. Must be a subset of \code{params}.
 #' @param params_report Character string or vector of character strings specifying which parameters to report. Must be a subset of \code{params}.
 #' @param ppc Character string or vector of character strings specifying the name of elements used for the posteriod predictive check (PPC). If specified, the summary information for these elements will be output in the report.
@@ -50,7 +50,7 @@ jagsRun <- function (jagsData,
                      RANDOM = FALSE,
                      Rhat_max = 1.05,
                      n_rburn = 0,
-                     n_max,
+                     n_max = NULL,
                      params_extra = params,
                      params_report = params,
                      ppc = NULL,
@@ -136,9 +136,15 @@ jagsRun <- function (jagsData,
 
     if (max(MCMCvis::MCMCsummary(out, params = params_report, Rhat = TRUE)[,6]) <= Rhat_max) CONVERGE <- TRUE
 
+    if(is.null(n_max))
+    {
+      n_max <- n_burn + ((n_rburn + n_draw)*2)
+    }
+
     if (EXTRA == TRUE)
     {
-      while(max(MCMCvis::MCMCsummary(out, params = params_extra, Rhat = TRUE)[,6]) > Rhat_max & n_total < n_max)
+      while(max(MCMCvis::MCMCsummary(out, params = params_extra, Rhat = TRUE)[,6]) > Rhat_max &
+            (n_total + n_rburn + n_draw) <= n_max)
       {
         out.2 <- parallel::clusterEvalQ(cl,
                                         {
@@ -215,6 +221,7 @@ jagsRun <- function (jagsData,
 
       if (EXTRA == TRUE) {
         cat(paste0('Rhat_max: ', Rhat_max, ' \n'))
+        cat(paste0('n_max: ', n_max, ' \n'))
         cat(paste0('n_rburn: ', n_rburn, ' \n'))
         cat(paste0('n_extra: ', n_extra, ' \n'))
       }

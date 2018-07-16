@@ -7,8 +7,9 @@
 jagsRun(jagsData, jagsModel, jagsInits, params, jagsID, jagsDsc, db_hash,
   n_chain = 3, n_adapt = 5000, n_burn, n_draw, n_thin = 1,
   DEBUG = FALSE, EXTRA = FALSE, RANDOM = FALSE, Rhat_max = 1.05,
-  n_rburn = 0, n_max, params_extra = params, params_report = params,
-  ppc = NULL, obj_out = FALSE, save_data = FALSE, report = TRUE)
+  n_rburn = 0, n_max = NULL, params_extra = params,
+  params_report = params, ppc = NULL, obj_out = FALSE,
+  save_data = FALSE, report = TRUE)
 }
 \arguments{
 \item{jagsData}{List containing data to feed to JAGS}
@@ -37,7 +38,7 @@ jagsRun(jagsData, jagsModel, jagsInits, params, jagsID, jagsDsc, db_hash,
 
 \item{DEBUG}{Logical used to specify whether DEBUG mode should be used. If \code{TRUE}, \code{jags.model} is called which begins adaptation with adapt = 2. This ensures that the likelihood can be calclated and the model run (priors and inits are appropriate).}
 
-\item{EXTRA}{Logical used to specify whether extra iterations should be run if convergence is not met. If \code{TRUE}, up to \code{n_max} iterations are run until convergence is reached (specified by \code{Rhat_max})}
+\item{EXTRA}{Logical used to specify whether extra iterations should be run if convergence is not met. If \code{TRUE}, another set of iterations (\code{n_draw}) is drawn (up to \code{n_max}) until convergence is reached (specified by \code{Rhat_max})}
 
 \item{RANDOM}{Logical specifying whether to use script to generate random inits. If \code{TRUE}, \code{jagsInits} should be a function that generates random initial values.}
 
@@ -45,7 +46,7 @@ jagsRun(jagsData, jagsModel, jagsInits, params, jagsID, jagsDsc, db_hash,
 
 \item{n_rburn}{Numeric specifying how many samples to use for burn in if \code{EXTRA = TRUE} and convergence (defined by \code{Rhat_max}) has not been reached.}
 
-\item{n_max}{Numeric specifying the maximum number of samples to be drawn when \code{EXTRA = TRUE}}
+\item{n_max}{Numeric specifying the maximum number of samples to be drawn when \code{EXTRA = TRUE}. The total number of iterations will not exceed this value (\code{n_burn}, \code{n_draw}, and \code{n_rburn} values are included in this total). If left blank, \code{n_max} is set to \code{n_burn} + (\code{n_rburn} + \code{n_draw})*2.}
 
 \item{params_extra}{Character string or vector of character strings specifying which parameters to evaluate convergence for when \code{EXTRA = TRUE}. Must be a subset of \code{params}.}
 
