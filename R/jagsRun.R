@@ -134,7 +134,7 @@ jagsRun <- function (jagsData,
     n_extra <- 0
     n_total <- n_burn + n_draw
 
-    if (max(MCMCvis::MCMCsummary(out, params = params_report, Rhat = TRUE)[,6]) <= Rhat_max) CONVERGE <- TRUE
+    if (max(MCMCvis::MCMCsummary(out, params = params_report, Rhat = TRUE)[,6], na.rm = TRUE) <= Rhat_max) CONVERGE <- TRUE
 
     if(is.null(n_max))
     {

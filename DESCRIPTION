@@ -1,6 +1,6 @@
 Package: jagsRun
 Title: Tools to run JAGS in parallel
-Version: 0.2.0
+Version: 0.2.1
 Authors@R: c(
     person("Casey", "Youngflesh", , "caseyyoungflesh@gmail.com", c("aut", "cre")),
     person("Christian", "Che-Castaldo", role = c("aut"), email = "checastaldo@icloud.com")
@@ -15,4 +15,4 @@ Imports:
     parallel,
     coda,
     MCMCvis
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1
